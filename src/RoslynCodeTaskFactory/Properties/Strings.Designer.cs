@@ -70,6 +70,15 @@ namespace RoslynCodeTaskFactory.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Auto detect parameters may only be enabled when the code type is Class..
+        /// </summary>
+        internal static string CodeTaskFactory_AudotDetectParametersForClassOnly {
+            get {
+                return ResourceManager.GetString("CodeTaskFactory_AudotDetectParametersForClassOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to MSB3421: The &lt;Code&gt; element is missing for the &quot;{0}&quot; task. This element is required..
         /// </summary>
         internal static string CodeTaskFactory_CodeElementIsMissing {
@@ -102,6 +111,15 @@ namespace RoslynCodeTaskFactory.Properties {
         internal static string CodeTaskFactory_FindSourceFileAt {
             get {
                 return ResourceManager.GetString("CodeTaskFactory_FindSourceFileAt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified auto detect parameters value &quot;{0}&quot; is invalid. The supported auto detect parameters values are &quot;{1}&quot;..
+        /// </summary>
+        internal static string CodeTaskFactory_InvalidAutoDetectParameters {
+            get {
+                return ResourceManager.GetString("CodeTaskFactory_InvalidAutoDetectParameters", resourceCulture);
             }
         }
         

@@ -187,6 +187,26 @@ namespace RoslynCodeTaskFactory
                 TaskType = assembly.GetExportedTypes().FirstOrDefault(type => type.Name.Equals(taskName));
             }
 
+            if (TaskType != null)
+            {
+                // Perform automatic parameter detection if requested.
+                //
+                if (taskInfo.AutoDetectParameters)
+                {
+                    PropertyInfo[] properties = TaskType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                    _parameters = new TaskPropertyInfo[properties.Length];
+                    for (int i = 0; i < properties.Length; i++)
+                    {
+                        PropertyInfo property = properties[i];
+                        _parameters[i] = new TaskPropertyInfo(
+                            property.Name,
+                            property.PropertyType,
+                            property.GetCustomAttribute<OutputAttribute>() != null,
+                            property.GetCustomAttribute<RequiredAttribute>() != null);
+                    }
+                }
+            }
+
             AppDomain.CurrentDomain.AssemblyResolve += AppDomain_AssemblyResolve;
 
             // Initialization succeeded if we found a type matching the task name from the compiled assembly
@@ -355,6 +375,7 @@ namespace RoslynCodeTaskFactory
 
             // Parse the attributes of the <Code /> element
             //
+            XAttribute autoDetectParametersAttribute = codeElement.Attribute("AutoDetectParameters");
             XAttribute languageAttribute = codeElement.Attributes().FirstOrDefault(i => i.Name.LocalName.Equals("Language", StringComparison.OrdinalIgnoreCase));
             XAttribute sourceAttribute = codeElement.Attributes().FirstOrDefault(i => i.Name.LocalName.Equals("Source", StringComparison.OrdinalIgnoreCase));
             XAttribute typeAttribute = codeElement.Attributes().FirstOrDefault(i => i.Name.LocalName.Equals("Type", StringComparison.OrdinalIgnoreCase));
@@ -393,6 +414,35 @@ namespace RoslynCodeTaskFactory
                 }
 
                 taskInfo.CodeType = codeType;
+            }
+
+            if (autoDetectParametersAttribute != null)
+            {
+                if (String.IsNullOrWhiteSpace(autoDetectParametersAttribute.Value))
+                {
+                    // A <Code AutoDetectParameters=""/> is not allowed
+                    //
+                    log.LogErrorWithCodeFromResources("CodeTaskFactory_AttributeEmpty", "AutoDetectParameters", "Code");
+                    return false;
+                }
+
+                // Attempt to parse the auto detect parameters option as a Boolean
+                //
+                if (!Boolean.TryParse(autoDetectParametersAttribute.Value, out Boolean autoDetectParameters))
+                {
+                    log.LogErrorWithCodeFromResources("CodeTaskFactory_InvalidAutoDetectParameters", autoDetectParametersAttribute.Value, String.Join(", ", Boolean.FalseString, Boolean.TrueString));
+                    return false;
+                }
+
+                // Only allow auto detection to be enabled when the type is set to Class
+                //
+                if (autoDetectParameters && taskInfo.CodeType != CodeTaskFactoryCodeType.Class)
+                {
+                    log.LogErrorWithCodeFromResources("CodeTaskFactory_AudotDetectParametersForClassOnly");
+                    return false;
+                }
+
+                taskInfo.AutoDetectParameters = autoDetectParameters;
             }
 
             if (languageAttribute != null)

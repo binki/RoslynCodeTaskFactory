@@ -10,6 +10,11 @@ namespace RoslynCodeTaskFactory.Internal
     internal sealed class TaskInfo : IEquatable<TaskInfo>
     {
         /// <summary>
+        /// Gets or sets whether parameters should be autodetected.
+        /// </summary>
+        public bool AutoDetectParameters { get; set; }
+        
+        /// <summary>
         /// Gets or sets the code language of the task.
         /// </summary>
         public string CodeLanguage { get; set; }
@@ -57,7 +62,7 @@ namespace RoslynCodeTaskFactory.Internal
                 return true;
             }
 
-            return References.Equals(other.References) && String.Equals(SourceCode, other.SourceCode, StringComparison.OrdinalIgnoreCase);
+            return AutoDetectParameters == other.AutoDetectParameters && References.Equals(other.References) && String.Equals(SourceCode, other.SourceCode, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <inheritdoc cref="Equals(Object)"/>

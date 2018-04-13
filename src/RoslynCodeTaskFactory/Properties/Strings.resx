@@ -121,6 +121,9 @@
     <value>MSB3420: The "{0}" attribute of the &lt;{1}&gt; element has been set but is empty. If the "{0}" attribute is set it must not be empty.</value>
     <comment>{StrBegin="MSB3420: "}</comment>
   </data>
+  <data name="CodeTaskFactory_AudotDetectParametersForClassOnly" xml:space="preserve">
+    <value>Auto detect parameters may only be enabled when the code type is Class.</value>
+  </data>
   <data name="CodeTaskFactory_CodeElementIsMissing" xml:space="preserve">
     <value>MSB3421: The &lt;Code&gt; element is missing for the "{0}" task. This element is required.</value>
     <comment>{StrBegin="MSB3421: "}</comment>
@@ -134,6 +137,9 @@
   </data>
   <data name="CodeTaskFactory_FindSourceFileAt" xml:space="preserve">
     <value>The source file for this compilation can be found at: "{0}"</value>
+  </data>
+  <data name="CodeTaskFactory_InvalidAutoDetectParameters" xml:space="preserve">
+    <value>The specified auto detect parameters value "{0}" is invalid. The supported auto detect parameters values are "{1}".</value>
   </data>
   <data name="CodeTaskFactory_InvalidCodeLanguage" xml:space="preserve">
     <value>MSB3423: The specified code language "{0}" is invalid.  The supported code languages are "{1}".</value>

@@ -139,6 +139,14 @@ End Namespace";
         }
 
         [Test]
+        public void AutoDetectParameters()
+        {
+            TryLoadTaskBodyAndExpectSuccess(
+                taskBody: "<Code Type=\"Class\" AutoDetectParameters=\"true\">code</Code>",
+                expectedAutoDetectParameters: true);
+        }
+
+        [Test]
         public void CodeLanguageFromTaskBody()
         {
             TryLoadTaskBodyAndExpectSuccess("<Code Language=\"CS\">code</Code>", expectedCodeLanguage: "CS");
@@ -276,6 +284,36 @@ namespace InlineCode
         }
 
         [Test]
+        public void DoNotAutoDetectParametersWhenUnspecifiedForFragment()
+        {
+            const string taskBody = @"
+                <Code>code</Code>";
+
+            TryLoadTaskBodyAndExpectSuccess(
+                taskBody,
+                expectedAutoDetectParameters: false);
+        }
+
+        [Test]
+        public void DoNotAutoDetectParametersWhenSpecifiedForClass()
+        {
+            const string taskBody = @"
+                <Code Type=""Class"">code</Code>";
+
+            TryLoadTaskBodyAndExpectSuccess(
+                taskBody,
+                expectedAutoDetectParameters: false);
+        }
+
+        [Test]
+        public void EmptyAutoDetectParameters()
+        {
+            TryLoadTaskBodyAndExpectFailure(
+                taskBody: "<Code AutoDetectParameters=\"\">code</Code>",
+                expectedErrorMessage: "The \"AutoDetectParameters\" attribute of the <Code> element has been set but is empty. If the \"AutoDetectParameters\" attribute is set it must not be empty.");
+        }
+
+        [Test]
         public void EmptyCodeElement()
         {
             TryLoadTaskBodyAndExpectFailure(
@@ -328,6 +366,22 @@ namespace InlineCode
         {
             TryLoadTaskBodyAndExpectSuccess("<!-- Comment --><Code>code</Code>");
             TryLoadTaskBodyAndExpectSuccess("                <Code>code</Code>");
+        }
+
+        [Test]
+        public void InvalidAutoDetectParameters()
+        {
+            TryLoadTaskBodyAndExpectFailure(
+                taskBody: "<Code AutoDetectParameters=\"Invalid\">code</Code>",
+                expectedErrorMessage: "The specified auto detect parameters value \"Invalid\" is invalid. The supported auto detect parameters values are \"False, True\".");
+        }
+
+        [Test]
+        public void InvalidAutoDetectParametersForFragment()
+        {
+            TryLoadTaskBodyAndExpectFailure(
+                taskBody: "<Code AutoDetectParameters=\"True\">code</Code>",
+                expectedErrorMessage: "Auto detect parameters may only be enabled when the code type is Class.");
         }
 
         [Test]
@@ -466,7 +520,8 @@ namespace InlineCode
             ISet<string> expectedNamespaces = null,
             string expectedCodeLanguage = null,
             CodeTaskFactoryCodeType? expectedCodeType = null,
-            string expectedSourceCode = null)
+            string expectedSourceCode = null,
+            bool? expectedAutoDetectParameters = null)
         {
             MockBuildEngine buildEngine = new MockBuildEngine();
 
@@ -504,6 +559,11 @@ namespace InlineCode
             if (expectedSourceCode != null)
             {
                 taskInfo.SourceCode.ShouldBe(expectedSourceCode, StringCompareShould.IgnoreLineEndings);
+            }
+
+            if (expectedAutoDetectParameters.HasValue)
+            {
+                taskInfo.AutoDetectParameters.ShouldBe(expectedAutoDetectParameters.Value);
             }
         }
 
